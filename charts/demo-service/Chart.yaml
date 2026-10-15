@@ -1,0 +1,6 @@
+apiVersion: v2
+name: demo-service
+description: A small web service released with an Argo Rollouts canary and an automatic check
+type: application
+version: 0.1.0
+appVersion: "blue"

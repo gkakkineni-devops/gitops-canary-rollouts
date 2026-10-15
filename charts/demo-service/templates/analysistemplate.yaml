@@ -1,0 +1,36 @@
+{{- if .Values.analysis.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: {{ include "demo-service.name" . }}-check
+  labels:
+    {{- include "demo-service.labels" . | nindent 4 }}
+spec:
+  args:
+    - name: canary-service
+  metrics:
+    - name: canary-responds
+      interval: 10s
+      count: 3
+      failureLimit: 1
+      provider:
+        job:
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                  - name: check
+                    image: {{ .Values.analysis.image }}
+                    command: [sh, -c]
+                    args:
+                      - |
+                        i=0
+                        while [ "$i" -lt {{ .Values.analysis.requests }} ]; do
+                          code=$(curl -s -o /dev/null -w '%{http_code}' "http://{{ "{{" }}args.canary-service{{ "}}" }}{{ .Values.analysis.path }}")
+                          echo "request $i: $code"
+                          [ "$code" = "200" ] || exit 1
+                          i=$((i+1))
+                        done
+{{- end }}

@@ -1,0 +1,35 @@
+replicaCount: 5
+
+image:
+  repository: argoproj/rollouts-demo
+  tag: blue
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+  targetPort: 8080
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    memory: 64Mi
+
+# If new pods are not ready in this time, the release is aborted and traffic stays on the old version.
+progressDeadlineSeconds: 90
+
+canary:
+  # Weight steps. Each pause gives the check time to run before the next step.
+  steps:
+    - setWeight: 20
+    - pause: {duration: 30s}
+    - setWeight: 60
+    - pause: {duration: 30s}
+
+# The automatic check that decides whether a release keeps going or rolls back.
+analysis:
+  enabled: true
+  path: /
+  requests: 10
+  image: curlimages/curl:8.10.1

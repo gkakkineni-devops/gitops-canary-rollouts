@@ -1,0 +1,56 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include "demo-service.name" . }}
+  labels:
+    {{- include "demo-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: {{ .Values.progressDeadlineSeconds }}
+  progressDeadlineAbort: true
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "demo-service.name" . }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "demo-service.name" . }}
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.targetPort }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.targetPort }}
+            periodSeconds: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+  strategy:
+    canary:
+      canaryService: {{ include "demo-service.name" . }}-canary
+      stableService: {{ include "demo-service.name" . }}-stable
+      {{- if .Values.analysis.enabled }}
+      analysis:
+        templates:
+          - templateName: {{ include "demo-service.name" . }}-check
+        startingStep: 1
+        args:
+          - name: canary-service
+            value: {{ include "demo-service.name" . }}-canary
+      {{- end }}
+      steps:
+        {{- toYaml .Values.canary.steps | nindent 8 }}
