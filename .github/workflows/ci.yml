@@ -50,13 +50,8 @@ jobs:
 
       - name: Scan the manifests with Trivy
         run: |
-          set +e
-          docker pull -q aquasec/trivy:0.57.1 >/dev/null
           docker run --rm -v "$PWD:/src" aquasec/trivy:0.57.1 config \
-            --severity HIGH,CRITICAL --exit-code 1 /src > trivy.txt 2>&1
-          rc=$?
-          sed 's/^/::error::/' trivy.txt | grep -v "^$" | head -40
-          exit $rc
+            --severity HIGH,CRITICAL --exit-code 1 /src
 
   e2e:
     name: Roll out a good and a bad release on kind
