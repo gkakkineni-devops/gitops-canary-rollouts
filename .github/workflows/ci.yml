@@ -49,12 +49,9 @@ jobs:
             rendered.yaml argocd/application.yaml
 
       - name: Scan the manifests with Trivy
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: config
-          scan-ref: .
-          severity: HIGH,CRITICAL
-          exit-code: "1"
+        run: |
+          docker run --rm -v "$PWD:/src" aquasec/trivy:0.57.1 config \
+            --severity HIGH,CRITICAL --exit-code 1 /src/charts /src/argocd
 
   e2e:
     name: Roll out a good and a bad release on kind
