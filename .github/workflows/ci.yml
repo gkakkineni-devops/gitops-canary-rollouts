@@ -53,7 +53,7 @@ jobs:
           set +e
           docker pull -q aquasec/trivy:0.57.1 >/dev/null
           docker run --rm -v "$PWD:/src" aquasec/trivy:0.57.1 config \
-            --severity HIGH,CRITICAL --exit-code 1 /src/charts /src/argocd > trivy.txt 2>&1
+            --severity HIGH,CRITICAL --exit-code 1 /src > trivy.txt 2>&1
           rc=$?
           sed 's/^/::error::/' trivy.txt | grep -v "^$" | head -40
           exit $rc
