@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARGO_ROLLOUTS_VERSION: v1.7.2
+  ARGO_ROLLOUTS_VERSION: v1.10.1
   KUBECONFORM_VERSION: v0.6.7
 
 jobs:
