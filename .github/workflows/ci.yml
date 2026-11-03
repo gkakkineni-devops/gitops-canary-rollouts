@@ -22,7 +22,7 @@ jobs:
     name: Lint and validate manifests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: azure/setup-helm@v4
         with:
@@ -59,7 +59,7 @@ jobs:
     needs: lint
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - uses: azure/setup-helm@v4
         with:
