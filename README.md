@@ -1,5 +1,7 @@
 # gitops-canary-rollouts
 
+[![ci](https://github.com/gkakkineni-devops/gitops-canary-rollouts/actions/workflows/ci.yml/badge.svg)](https://github.com/gkakkineni-devops/gitops-canary-rollouts/actions/workflows/ci.yml)
+
 A small Helm chart that releases a web service as a canary with Argo Rollouts, and an Argo CD Application that keeps a cluster in sync with this repo.
 
 This is a practice project. It uses a public demo image (`argoproj/rollouts-demo`), not code from my job.
