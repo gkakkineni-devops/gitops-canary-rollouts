@@ -14,6 +14,21 @@ This is a practice project. It uses a public demo image (`argoproj/rollouts-demo
 4. While it pauses, a small check job sends requests to the canary and expects a 200 each time. If the check fails, the release stops and the old version keeps serving.
 5. If the new pods never become ready (a bad image tag, say), the release is aborted after `progressDeadlineSeconds` and users stay on the old version.
 
+```mermaid
+flowchart LR
+    git[Push to main] --> argo[Argo CD syncs]
+    argo --> rollout[Rollout: new pods start]
+    rollout --> s20[20% canary]
+    s20 --> check1{Check job: 200?}
+    check1 -- yes --> s60[60% canary]
+    s60 --> check2{Check job: 200?}
+    check2 -- yes --> full[100% new version]
+    check1 -- no --> abort[Abort, old version keeps serving]
+    check2 -- no --> abort
+```
+
+The boxes are the steps in `charts/demo-service/values.yaml`. The check job is the AnalysisTemplate.
+
 ## Layout
 
 ```
