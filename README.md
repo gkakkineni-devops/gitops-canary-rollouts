@@ -72,6 +72,12 @@ CI does two things on every push.
 - The check job only tests that the canary answers with a 200. A real service should check error rate and latency from metrics.
 - I haven't pointed this at a cloud cluster. CI runs it on kind.
 
+## What I'd do next
+
+- Make the check read real numbers. A small AnalysisTemplate that asks Prometheus for the canary's error rate and latency would be a better gate than "did it answer with a 200", and it could sit behind a values flag so the simple check stays the default.
+- Put an ingress or a service mesh in front so the weights are exact instead of following replica counts.
+- Run the Argo CD Application against a cluster in CI too, so the sync path gets tested and not only the Helm release.
+
 ## License
 
 MIT
