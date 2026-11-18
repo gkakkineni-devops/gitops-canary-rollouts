@@ -4,6 +4,7 @@ Newest first. Dates are when the change landed on main.
 
 ## 2026-11
 
+- Nov 18: README got an "If something doesn't work" section.
 - Nov 13: README got a "What I'd do next" section.
 - Nov 13: README got a diagram of the canary steps.
 - Nov 8: README got a CI status badge.

@@ -72,6 +72,14 @@ CI does two things on every push.
 - The check job only tests that the canary answers with a 200. A real service should check error rate and latency from metrics.
 - I haven't pointed this at a cloud cluster. CI runs it on kind.
 
+## If something doesn't work
+
+- **The rollout sits at "Progressing" and never finishes.** Run `kubectl argo rollouts get rollout demo -n demo`. A bad image tag shows pods stuck in `ImagePullBackOff`. After `progressDeadlineSeconds` (90 seconds by default) the release is aborted and the old version keeps serving, so this is the chart doing its job. Fix the tag and release again.
+- **The release stopped after the first step.** The check job probably failed. Look at the AnalysisRun with `kubectl get analysisrun -n demo` and read the check pod's log. It prints one line per request with the status code, and it fails on the first one that isn't a 200.
+- **`kubectl argo rollouts` says the command isn't found.** It is a separate kubectl plugin, not part of kubectl. Install it from the Argo Rollouts releases page.
+- **`kubectl apply` of the Argo Rollouts install file fails with an "annotation too long" error.** Newer install files are big. Use `kubectl apply --server-side`, which is what CI does.
+- **Weights don't look exactly like 20% and 60%.** Expected. With no ingress or mesh, traffic follows replica counts, so with 5 replicas 20% is one pod. See Limits.
+
 ## What I'd do next
 
 - Make the check read real numbers. A small AnalysisTemplate that asks Prometheus for the canary's error rate and latency would be a better gate than "did it answer with a 200", and it could sit behind a values flag so the simple check stays the default.
